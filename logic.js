@@ -2,47 +2,58 @@
 const url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson';
 
 d3.json(url).then(function (data) {
-  //createFeatures(data.features);
+  createFeatures(data.features);
   console.log(data.features);
+
 });
 
-/*
 function createFeatures(earthquakeData) {
   // Create a circle for each feature in the features array
   // The circle sizes should be related to earthquake magnitude
+  function eachFeature(features, layer) {
+    layer.bindPopup(`<h3>${features.properties.place}</h3><hr><p>${features.properties.mag}</p><hr><p>${new Date(features.properties.time)}</p>`);
+  }
 
   // Create a GeoJSON layer, insert the features
-  var earthquakes = L.geoJSON(earthquakeData, )
-}
-*/
-
-// Base layers
-var streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  var earthquakes = L.geoJSON(earthquakeData, {
+    eachFeature: eachFeature
   });
 
-var topogMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-  attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-});
+  createMap(earthquakes);
+}
 
-/*
-L.tileLayer('https://api.mapbox.com/v4/{tileset_id}/{zoom}/{x}/{y}{@2x}.{format}', {
-  attribution: `© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>`
-});
-*/
+function createMap(earthquakes) {
+  // Base layers
+  var streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
 
-// baseMaps object
-var baseMaps = {
-  'Street Map': streetMap,
-  'Topographic Map': topogMap
-};
+  var topogMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+  });
 
-// Map object
-var map = L.map('map', {
-    center: [40.367, -13.431],
-    zoom: 3,
-    layers: streetMap
-});
+  // baseMaps object
+  var baseMaps = {
+    'Street Map': streetMap,
+    'Topographic Map': topogMap
+    //'MapTiles': mtilesMap
+  };
 
-// Layer control
-L.control.layers(baseMaps).addTo(map);
+  // overlay object
+  var overlayMaps = {
+    Earthquakes: earthquakes
+  };
+
+  // Map object
+  var map = L.map('map', {
+      center: [40.367, -13.431],
+      zoom: 3,
+      layers: [streetMap, earthquakes]
+  });
+
+  // Layer control
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(map);
+
+}
