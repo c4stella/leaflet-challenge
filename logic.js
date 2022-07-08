@@ -3,15 +3,14 @@ const url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month
 
 d3.json(url).then(function (data) {
   createFeatures(data.features);
-  console.log(data.features);
-
+  //console.log(data.features[0].properties.mag);
 });
 
 function createFeatures(earthquakeData) {
   // Create a circle for each feature in the features array
   // The circle sizes should be related to earthquake magnitude
-  function eachFeature(features, layer) {
-    layer.bindPopup(`<h3>${features.properties.place}</h3><hr><p>${features.properties.mag}</p><hr><p>${new Date(features.properties.time)}</p>`);
+  function eachFeature(feature, layer) {
+    layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${feature.properties.mag}</p><hr><p>${new Date(feature.properties.time)}</p>`);
   }
 
   // Create a GeoJSON layer, insert the features
