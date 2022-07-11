@@ -40,6 +40,8 @@ function createFeatures(response) {
   // Create a circle for each feature in the features array
   // The circle sizes should be related to earthquake magnitude
   ///*
+
+  // this section probably not needed
   var allEarthquakes = response.features;
   console.log(allEarthquakes);
 
@@ -67,8 +69,43 @@ function createFeatures(response) {
     layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${feature.properties.mag}</p><hr><p>${new Date(feature.properties.time)}</p>`);
   }
   
+  // TEST pointToLayer FUNCTION
   /*
-  function eqIntensity () {
+  function pointToLayer(feature, latlng) {
+
+    feature.length;
+    feature.properties.mag
+
+    for (var i = 0; i < allEarthquakes.length; i++) {
+      var quake = allEarthquakes[i];
+      var mag = quake.properties.mag;
+      var color = '';
+      var fillColor = '';
+      var radius;
+
+      if (mag >= 7) {
+        color = 'red';
+        fillColor: '#ff2b1c';
+      }
+      else if (mag >= 5) {
+        color = 'yellow';
+        fillColor: '#ffca1c';
+      }
+      else {
+        color = 'green';
+        fillColor: '#1ef50f';
+      }
+
+      return L.circleMarker(latlng, {
+        radius: mag * 100,
+        color: color,
+        fillColor: fillColor,
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      })
+
+    }
 
   }
   */
