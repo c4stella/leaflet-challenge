@@ -33,102 +33,76 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(map);
 
+  // Legend object
+  /*
+  var legend = L.control({position: 'bottomright'});
+  legend.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'info-legend'),
+      grades = [],
+      labels = [];
+    for (var i = 0; i < grades.length; i++) {
+      div.innerHTML += '<i style="background:' + '"></i>'
+    }
+  };
+  legend.addTo(map);
+  */
+
 }
 
 // Function to define features
 function createFeatures(response) {
-  // Create a circle for each feature in the features array
-  // The circle sizes should be related to earthquake magnitude
-  ///*
 
-  // this section probably not needed
-  var allEarthquakes = response.features;
-  console.log(allEarthquakes);
-
-  /*
-  var eqMarkers = [];
-
-  for (var i = 0; i < allEarthquakes.length; i++) {
-    var quake = allEarthquakes[i];
-
-    var coord = quake.geometry.coordinates;
-    var lat = coord[0];
-    var lng = coord[1];
-
-    var mag = quake.properties.mag;
-
-    eqMarkers.push(
-      L.circle([lat, lng], {
-        radius: mag * 100
-      })
-    );
-  }
-  */
-
+  // Generates popups at each data point
   function onEachFeature(feature, layer) {
     layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${feature.properties.mag}</p><hr><p>${new Date(feature.properties.time)}</p>`);
   }
   
-  // TEST pointToLayer FUNCTION
-  /*
+  // Generates circle markers with properties dependent on earthquake magnitude
   function pointToLayer(feature, latlng) {
 
-    feature.length;
-    feature.properties.mag
+    var mag = feature.properties.mag;
+    var color = '';
+    var fillColor = '';
+    var radius;
 
-    for (var i = 0; i < allEarthquakes.length; i++) {
-      var quake = allEarthquakes[i];
-      var mag = quake.properties.mag;
-      var color = '';
-      var fillColor = '';
-      var radius;
-
-      if (mag >= 7) {
-        color = 'red';
-        fillColor: '#ff2b1c';
-      }
-      else if (mag >= 5) {
-        color = 'yellow';
-        fillColor: '#ffca1c';
-      }
-      else {
-        color = 'green';
-        fillColor: '#1ef50f';
-      }
-
-      return L.circleMarker(latlng, {
-        radius: mag * 100,
-        color: color,
-        fillColor: fillColor,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-      })
-
+    if (mag >= 5) {
+      color = 'red';
+      fillColor = '#ff2b1c';
+      radius = mag * 1.8;
+    }
+    else if (mag < 5 && mag >= 4.6) {
+      color = 'yellow';
+      fillColor = '#ffca1c';
+      radius = mag * 1.4;
+    }
+    
+    else if (mag < 4.6) {
+      color = 'green';
+      fillColor = '#1ef50f';
+      radius = mag;
     }
 
+    return L.circleMarker(latlng, {
+      radius: radius,
+      color: color,
+      fillColor: fillColor,
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    })
+
   }
-  */
 
   // Create a GeoJSON layer, insert the features
   var earthquakes = L.geoJSON(response, {
     onEachFeature: onEachFeature,
-    pointToLayer: function (feature, latlng) {
-      return L.circleMarker(latlng, {
-        radius: 10,
-        color: 'blue',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-      })
-
-    }
+    pointToLayer: pointToLayer
   });
 
+  // Create the map
   createMap(earthquakes);
 }
 
 // Getting data
 const url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson';
-
 d3.json(url).then(createFeatures);
